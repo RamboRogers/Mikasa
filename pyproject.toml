@@ -1,0 +1,32 @@
+[project]
+name = "mikasa"
+version = "0.1.0"
+description = "Fine-tuning Qwen3-4B-Thinking to create Mikasa, a kawaii AI assistant"
+requires-python = ">=3.10"
+dependencies = [
+    "torch>=2.0.0",
+    "transformers>=4.40.0",
+    "datasets>=2.14.0",
+    "accelerate>=0.25.0",
+    "peft>=0.8.0",
+    "trl>=0.8.0",
+    "huggingface-hub>=0.20.0",
+    "tqdm>=4.66.0",
+    "pyyaml>=6.0.1",
+    "sentencepiece>=0.1.99",
+    "protobuf>=3.20.0",
+    "gradio>=4.44.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ipython>=8.0.0",
+    "jupyter>=1.0.0",
+]
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = []  # No packages to install, only dependencies

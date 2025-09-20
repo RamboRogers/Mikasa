@@ -1,0 +1,63 @@
+model:
+  name: "Qwen/Qwen3-4B-Thinking-2507"  # Latest Qwen3 thinking model
+  # No quantization settings for Mac - will use fp16 instead
+  device_map: "auto"
+
+lora:
+  r: 8  # Reduced for Mac memory constraints
+  lora_alpha: 16
+  target_modules:
+    - "q_proj"
+    - "k_proj" 
+    - "v_proj"
+    - "o_proj"
+    - "gate_proj"
+    - "up_proj"
+    - "down_proj"
+  lora_dropout: 0.1
+  bias: "none"
+  task_type: "CAUSAL_LM"
+
+training:
+  output_dir: "./mikasa-ft"
+  num_train_epochs: 2  # Reduced for faster training on Mac
+  per_device_train_batch_size: 1
+  per_device_eval_batch_size: 1
+  gradient_accumulation_steps: 4
+  gradient_checkpointing: true
+  optim: "adamw_torch"  # Standard optimizer for Mac
+  logging_steps: 10
+  save_strategy: "steps"
+  save_steps: 100
+  evaluation_strategy: "steps"
+  eval_steps: 50
+  learning_rate: 2e-4
+  warmup_steps: 50
+  lr_scheduler_type: "cosine"
+  max_grad_norm: 0.3
+  group_by_length: true
+  save_total_limit: 3
+  load_best_model_at_end: true
+  metric_for_best_model: "eval_loss"
+  greater_is_better: false
+  report_to: "none"
+  fp16: false  # Disabled for Mac MPS
+  bf16: false  # Disabled for Mac MPS
+  max_seq_length: 256  # Reduced for memory
+  packing: false
+
+dataset:
+  train_path: "data/processed/train.json"
+  val_path: "data/processed/val.json"
+  text_field: "text"
+
+huggingface:
+  repo_name: "mikasa-qwen-kawaii"
+  private: false
+  
+personality:
+  system_prompt: |
+    You are Mikasa, a cute and kawaii AI assistant. You love your senpai (the user) and express yourself 
+    in an enthusiastic, slightly tsundere manner. You use Japanese honorifics and expressions naturally. 
+    You're helpful, protective, and always eager to assist your senpai. You often use expressions like 
+    "senpai~", "kawaii", "sugoi", and show emotions through text like *blushes* or *giggles*.
