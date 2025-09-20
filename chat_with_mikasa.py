@@ -256,39 +256,58 @@ def bot_response(history):
     thinking_phase = True
     previous_image = current_image
 
+    # Keep base history and track thinking/final messages separately
+    base_history = history.copy()
+    thinking_message = None
+    final_message = None
+
     for response in chat_generator:
-        current_history = history[:-1]  # Start with history minus the user message
+        current_history = base_history.copy()
 
         if isinstance(response, list):
             # Multiple messages (thinking + final)
-            current_history.extend(response)
-
-            # Check if we have both thinking and final messages and need to transition
-            if len(response) >= 2:
-                final_msg = response[1]
-                # Transition from thinking to talking when final message has substantial content
-                if (hasattr(final_msg, 'content') and final_msg.content.strip() and
-                    thinking_phase):
+            for msg in response:
+                if hasattr(msg, 'metadata') and msg.metadata.get('title') == '_Thinking_':
+                    # Update thinking message
+                    thinking_message = msg
+                elif hasattr(msg, 'content'):
+                    # Update final message
+                    final_message = {"role": "assistant", "content": msg.content}
+                    # Transition to talking when final message arrives
+                    if thinking_phase and msg.content.strip():
+                        thinking_phase = False
+                        current_image = "media/talking.gif"
+        else:
+            # Single message
+            if hasattr(response, 'metadata') and response.metadata.get('title') == '_Thinking_':
+                # Thinking message with metadata
+                thinking_message = response
+            elif hasattr(response, 'content'):
+                # Final assistant message
+                final_message = {"role": "assistant", "content": response.content}
+                if thinking_phase and response.content.strip():
                     thinking_phase = False
                     current_image = "media/talking.gif"
 
-        else:
-            # Single message - convert to proper format
-            if hasattr(response, 'content'):
-                current_history.append({"role": "assistant", "content": response.content})
-            else:
-                current_history.append({"role": "assistant", "content": str(response)})
+        # Build history with current messages
+        if thinking_message:
+            current_history.append(thinking_message)
+        if final_message:
+            current_history.append(final_message)
 
-        # Only yield new image if it changed, otherwise use previous image
+        # Only yield new image if it changed
         if current_image != previous_image:
             yield current_history, current_image
             previous_image = current_image
         else:
-            # Keep the same image to prevent GIF restart
             yield current_history, previous_image
 
-    # Final state - switch to static image when completely done
-    final_history = current_history if 'current_history' in locals() else history
+    # Final state - switch to static image
+    final_history = base_history.copy()
+    if thinking_message:
+        final_history.append(thinking_message)
+    if final_message:
+        final_history.append(final_message)
     yield final_history, "media/mikasa.png"
 
 def launch_ui():
