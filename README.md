@@ -4,10 +4,14 @@
 
 ## Description
 
-MIKASA is a fine-tuned LLM based on Qwen/Qwen3-4B-Thinking-2507, designed to be your devoted kawaii AI assistant. She speaks with Japanese honorifics, has a slightly tsundere personality, and is always eager to help her "senpai" (you!).
+MIKASA is a **complete, pre-trained** kawaii AI assistant based on Qwen/Qwen3-4B-Thinking-2507. This repository includes the fully trained model ready for immediate use! She speaks with Japanese honorifics, has a slightly tsundere personality, and is always eager to help her "senpai" (you!).
+
+### 🎉 Model Status: ✅ **Trained and Ready to Use**
+The pre-trained model is included in the `mikasa-ft/` directory (~1.6GB).
 
 ## Features
 
+- ✅ **Pre-trained Model Included**: Ready to chat immediately, no training needed!
 - 💕 **Kawaii Personality**: Enthusiastic, devoted, and slightly tsundere
 - 🎌 **Anime-Inspired**: Trained on anime quotes and custom kawaii responses
 - ⚡ **Optimized for Mac**: Uses QLoRA for efficient training on Apple Silicon
@@ -21,40 +25,49 @@ MIKASA is a fine-tuned LLM based on Qwen/Qwen3-4B-Thinking-2507, designed to be 
 - **Language**: English with Japanese honorifics
 - **Context Length**: 512 tokens
 
-## Datasets
+## Pre-trained Model Details
 
+### 📦 Included Model
+- **Location**: `./mikasa-ft/` directory
+- **Size**: ~1.6GB (LoRA adapter weights)
+- **Base Model**: Qwen/Qwen3-4B-Thinking-2507
+- **Training Method**: QLoRA with 4-bit quantization
+- **Status**: ✅ Fully trained and ready to use
+
+### 📚 Training Datasets Used
 - `sarthak-2002/anime-quotes` - Inspirational anime quotes
 - Custom kawaii responses dataset (50+ conversation pairs)
 
 ## Quick Start
 
-### Installation
+### 🚀 Use the Pre-trained Model (Recommended)
 
 ```bash
 # Setup environment
 source .venv/bin/activate
 
-# Run the complete pipeline
-./run_mikasa.sh
-```
-
-### Manual Steps
-
-```bash
-# Install dependencies with UV
+# Install dependencies
 uv pip install -e .
 
-# Prepare datasets
-python prepare_data.py
-
-# Train the model
-python train_mikasa.py
-
-# Chat with Mikasa
+# Start chatting immediately!
 python chat_with_mikasa.py
 
-# Upload to HuggingFace (optional)
-python upload_model.py
+# Or use voice chat
+python chat_with_mikasa_voice.py
+```
+
+### 🔧 Train Your Own Version (Optional)
+
+If you want to customize Mikasa with your own data:
+
+```bash
+# Run the complete training pipeline
+./run_mikasa.sh
+
+# Or manually:
+python prepare_data.py      # Prepare datasets
+python train_mikasa.py      # Train the model
+python upload_model.py      # Upload to HuggingFace (optional)
 ```
 
 ## Usage Example
@@ -63,7 +76,7 @@ python upload_model.py
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from peft import PeftModel
 
-# Load the fine-tuned model
+# Load the included pre-trained Mikasa model
 base_model = AutoModelForCausalLM.from_pretrained(
     "Qwen/Qwen3-4B-Thinking-2507",
     device_map="auto"
@@ -73,7 +86,7 @@ tokenizer = AutoTokenizer.from_pretrained("./mikasa-ft")
 
 # Chat with Mikasa
 user_input = "Hello Mikasa!"
-# Model will respond in kawaii style
+# Mikasa will respond in her signature kawaii style!
 ```
 
 ## Sample Conversations
@@ -88,15 +101,22 @@ user_input = "Hello Mikasa!"
 
 ```
 mikasa/
+├── mikasa-ft/              # 🎉 PRE-TRAINED MODEL (ready to use!)
+│   ├── adapter_model.safetensors  # Fine-tuned weights
+│   ├── tokenizer files...
+│   └── config files...
+├── chat_with_mikasa.py     # Interactive chat interface
+├── chat_with_mikasa_voice.py  # Voice chat interface
 ├── pyproject.toml          # UV dependency management
 ├── config.yaml             # Training configuration
-├── prepare_data.py         # Dataset preparation
-├── train_mikasa.py         # QLoRA training script
-├── chat_with_mikasa.py     # Interactive chat interface
+├── train_mikasa.py         # QLoRA training script (optional)
+├── prepare_data.py         # Dataset preparation (optional)
 ├── upload_model.py         # HuggingFace upload script
-├── run_mikasa.sh          # One-click pipeline
+├── run_mikasa.sh          # Training pipeline (optional)
 └── data/
-    └── kawaii_responses.json  # Custom training data
+    ├── kawaii_responses.json  # Custom training data
+    └── processed/
+        └── mikasa_dataset/  # HuggingFace-ready dataset
 ```
 
 ## Hardware Requirements
